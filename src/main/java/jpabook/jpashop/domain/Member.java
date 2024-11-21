@@ -8,6 +8,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@NamedEntityGraph(name = "Member.orders", attributeNodes = @NamedAttributeNode("orders"))
 @Entity
 @Getter @Setter
 public class Member {
