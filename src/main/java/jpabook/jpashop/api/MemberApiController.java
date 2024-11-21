@@ -1,6 +1,7 @@
 package jpabook.jpashop.api;
 
 import jpabook.jpashop.domain.Member;
+import jpabook.jpashop.repository.MemberJpaRepository;
 import jpabook.jpashop.service.MemberService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 public class MemberApiController {
 
     private final MemberService memberService;
+    private final MemberJpaRepository memberJpaRepository;
 
     /**
      * 등록 V1: 요청 값으로 Member 엔티티를 직접 받는다.
@@ -76,11 +78,15 @@ public class MemberApiController {
      */
     @GetMapping("/api/v2/members")
     public Result membersV2() {
+//        List<Member> findMembers = memberService.findMembers();
 
-        List<Member> findMembers = memberService.findMembers();
+        List<Member> findMembers = memberJpaRepository.findAll();
+
         //엔티티 -> DTO 변환
         List<MemberDto> collect = findMembers.stream()
-                .map(m -> new MemberDto(m.getName()))
+                .map(m -> new MemberDto(m.getName(),
+                        m.getOrders().stream().map(o -> new OrderApiController.OrderDto(o)).collect(Collectors.toList()))
+                )
                 .collect(Collectors.toList());
 
         return new Result(collect);
@@ -96,6 +102,7 @@ public class MemberApiController {
     @AllArgsConstructor
     static class MemberDto {
         private String name;
+        private List<OrderApiController.OrderDto> orders;
     }
 
     @Data
